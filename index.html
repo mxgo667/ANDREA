@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Andrea - Recherche de films sans violence animale</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fce4ec;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 40px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .logo-text {
+      font-size: 40px;
+      font-weight: bold;
+      color: #e91e63;
+      margin-bottom: 15px;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+    }
+
+    h1 {
+      color: #555;
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 70%;
+      border: 2px solid #e91e63;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #e91e63;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      margin: 10px 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #d81b60;
+    }
+
+    #result {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #444;
+      background-color: #ffeef2;
+      padding: 20px;
+      border-radius: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo-text">Andrea</div>
+    <h1>Vérifie si un film contient de la violence envers les animaux 🐾</h1>
+
+    <input type="text" id="filmInput" placeholder="Entrez le nom d’un film...">
+    <div>
+      <button onclick="verifierFilm()">Vérifier</button>
+      <button onclick="suggereFilm()">Suggestion</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function verifierFilm() {
+      const input = document.getElementById("filmInput").value.trim();
+      const resultat = document.getElementById("result");
+
+      if (!input) {
+        resultat.innerHTML = "❗Veuillez entrer un nom de film.";
+        return;
+      }
+
+      fetch('https://mxgo667.github.io/andrea/films.json')
+        .then(response => response.json())
+        .then(data => {
+          const film = input.toLowerCase();
+          let messageTrouve = null;
+
+          for (const titre in data) {
+            if (titre.toLowerCase() === film) {
+              messageTrouve = data[titre];
+              break;
+            }
+          }
+
+          if (messageTrouve) {
+            resultat.innerHTML = `<strong>${input}</strong> : ${messageTrouve}`;
+          } else {
+            resultat.innerHTML = `🤷 Aucune information trouvée pour <strong>${input}</strong>.`;
+          }
+        })
+        .catch(error => {
+          resultat.innerHTML = "❌ Erreur de chargement de la base de données.";
+          console.error(error);
+        });
+    }
+
+    function suggereFilm() {
+      fetch('https://mxgo667.github.io/andrea/films.json')
+        .then(response => response.json())
+        .then(data => {
+          const titres = Object.keys(data);
+          const aleatoire = titres[Math.floor(Math.random() * titres.length)];
+          const message = data[aleatoire];
+          document.getElementById("result").innerHTML =
+            `🎬 Suggestion : <strong>${aleatoire}</strong><br>${message}`;
+        })
+        .catch(error => {
+          document.getElementById("result").innerHTML = "❌ Erreur lors de la suggestion.";
+          console.error(error);
+        });
+    }
+  </script>
+
+</body>
+</html>
